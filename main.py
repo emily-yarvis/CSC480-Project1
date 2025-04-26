@@ -41,17 +41,16 @@ def buildPath(path, direction):
 
 
 
-def bfs(grid, startX, startY, rows, cols):
+def bfs(grid, startX, startY, rows, cols, dirty, nodesGenerated, nodesExpanded):
     
     q = deque()#Queue will hold sets of x, y, and the path
     visited = set()
-    dirty = set()
 
     visited.add((startX,startY))
     q.append((startX,startY,[]))#enque the start x y and the path
 
-    nodesGenerated = 0
-    nodesExpanded = 0 
+    #nodesGenerated = 0
+    #nodesExpanded = 0 
 
     while(q):
         node = q.popleft()
@@ -62,15 +61,16 @@ def bfs(grid, startX, startY, rows, cols):
         
         nodesExpanded += 1
 
-        if(path):
-            for p in path:
-                print(p)
-
-        if grid[y][x] == dirtyCell:
-            print("V")
-            
-
         
+
+        if grid[y][x] == dirtyCell and (x,y) not in dirty:
+            if(path):
+                for p in path:
+                    print(p)
+            print("V")
+            dirty.add((x,y))
+            return bfs(grid,x,y,rows,cols,dirty, nodesGenerated,nodesExpanded)
+            
 
         neighbors = getNeighbors(rows, cols, x, y)
         for n in neighbors:
@@ -86,21 +86,20 @@ def bfs(grid, startX, startY, rows, cols):
 
     
 
-def dfs(grid, x, y, visited, rows, cols,generated,expanded):
-    if len(visited) == rows * cols:
-        #print("Generated Nodes: ",generated)
-        return generated
+def dfs(grid, x, y, visited, rows, cols, generated, expanded):
+    expanded += 1  # Each time we visit a node, we expand it
 
     if grid[y][x] == dirtyCell:
         print("V")
 
     neighbors = getNeighbors(rows, cols, x, y)
-    generated = generated + len(neighbors)
-    for n in neighbors:  
+    generated += len(neighbors)  # Count how many neighbors we generated
+
+    for n in neighbors:
         if grid[n[1]][n[0]] != blockedCell and (n[0], n[1]) not in visited:
             visited.append((n[0], n[1]))
-            print(n[2])  
-            dfs(grid, n[0], n[1], visited, rows, cols,generated,expanded)
+            print(n[2])
+            generated, expanded = dfs(grid, n[0], n[1], visited, rows, cols, generated, expanded)
             if n[2] == "N":
                 print("S")
             elif n[2] == "S":
@@ -109,8 +108,11 @@ def dfs(grid, x, y, visited, rows, cols,generated,expanded):
                 print("W")
             elif n[2] == "W":
                 print("E")
-        elif grid[n[1]][n[0]] == blockedCell:  
+        elif grid[n[1]][n[0]] == blockedCell:
             visited.append((n[0], n[1]))
+
+    return generated, expanded
+
 
 if len(sys.argv) == 3:
     algo = sys.argv[1]
@@ -138,12 +140,13 @@ if len(sys.argv) == 3:
             n += 1
 
     startX, startY = findStart(lines, row, col)
-    print(lines)
-    print("#######################")
+   
     if(algo == "dfs"):
-        print("Generated Nodes",dfs(lines, startX, startY, [(startX, startY)],  row, col,0,0))
+        dfs = dfs(lines, startX, startY, [(startX, startY)],  row, col,0,0)
+        print("Generated Nodes: ", dfs[0])
+        print("Expanded Nodes: ", dfs[1])
     elif(algo == "bfs"):
-        bfs(lines, startX, startY,  row, col)
+        bfs(lines, startX, startY,  row, col,set(),0,0)
     else:
         raise Exception("Invalid Traversal Algo try again later")
 
