@@ -1,7 +1,7 @@
 from collections import deque
 import sys
 
-def findStart(arr, row, col):  # returns start points
+def findStart(arr, row, col):  
     print("ROW: ", row)
     print("COL: ", col)
     for y in range(row):
@@ -43,14 +43,13 @@ def buildPath(path, direction):
 
 def bfs(grid, startX, startY, rows, cols, dirty, nodesGenerated, nodesExpanded):
     
-    q = deque()#Queue will hold sets of x, y, and the path
+    q = deque()
     visited = set()
 
     visited.add((startX,startY))
-    q.append((startX,startY,[]))#enque the start x y and the path
+    q.append((startX,startY,[]))
 
-    #nodesGenerated = 0
-    #nodesExpanded = 0 
+    
 
     while(q):
         node = q.popleft()
@@ -87,13 +86,13 @@ def bfs(grid, startX, startY, rows, cols, dirty, nodesGenerated, nodesExpanded):
     
 
 def dfs(grid, x, y, visited, rows, cols, generated, expanded):
-    expanded += 1  # Each time we visit a node, we expand it
+    expanded += 1  
 
     if grid[y][x] == dirtyCell:
         print("V")
 
     neighbors = getNeighbors(rows, cols, x, y)
-    generated += len(neighbors)  # Count how many neighbors we generated
+    generated += len(neighbors)  
 
     for n in neighbors:
         if grid[n[1]][n[0]] != blockedCell and (n[0], n[1]) not in visited:
@@ -116,7 +115,7 @@ def dfs(grid, x, y, visited, rows, cols, generated, expanded):
 
 if len(sys.argv) == 3:
     algo = sys.argv[1]
-    fileName = sys.argv[2]  # check it's txt
+    fileName = sys.argv[2]  
 
     lines = []
     row = 0
